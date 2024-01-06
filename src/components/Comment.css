@@ -1,0 +1,12 @@
+/* Comment.css */
+.lightTheme {
+  /* Light theme styles */
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.darkTheme {
+  /* Dark theme styles */
+  background-color: #333;
+  color: #f0f0f0;
+}
