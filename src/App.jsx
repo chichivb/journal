@@ -27,8 +27,8 @@ function App() {
       </div>
       <div>
         <ul>
-          {documents.map((document) => (
-            <Comment text={document}></Comment>
+          {documents.map((document, index) => (
+            <Comment key={index} text={document}></Comment>
           ))}
         </ul>
       </div>
