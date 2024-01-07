@@ -2,30 +2,18 @@ import { useState, useEffect } from "react";
 import "./App.css";
 
 function useTodos() {
-  const [documents, setDocuments] = useState([]);
+  const [allTodos, setAllTodos] = useState([]);
+  const [filteredTodos, setFilteredTodos] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
-
-  const fetchTodos = async (page) => {
-    try {
-      const response = await fetch(
-        `https://jsonplaceholder.typicode.com/todos?_page=${page}`
-      );
-      const data = await response.json();
-      setDocuments(data);
-    } catch (error) {
-      console.error("Error fetching todos:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchTodos(1); // Initial fetch
-  }, []);
+  const todosPerPage = 5; // Adjust the number of todos per page
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     fetch("https://jsonplaceholder.typicode.com/todos")
       .then((response) => response.json())
       .then((data) => {
-        const totalPages = Math.ceil(data.length / 10); // Assuming 10 todos per page
+        setAllTodos(data);
+        const totalPages = Math.ceil(data.length / todosPerPage);
         setTotalPages(totalPages);
       })
       .catch((error) => {
@@ -33,14 +21,22 @@ function useTodos() {
       });
   }, []);
 
-  return { documents, totalPages, fetchTodos };
+  useEffect(() => {
+    const startIndex = (currentPage - 1) * todosPerPage;
+    const endIndex = startIndex + todosPerPage;
+    const slicedTodos = allTodos.slice(startIndex, endIndex);
+    setFilteredTodos(slicedTodos);
+  }, [allTodos, currentPage]);
+
+  return { filteredTodos, totalPages };
 }
 
 function App() {
   const [darkTheme, setDarkTheme] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { documents, totalPages, fetchTodos } = useTodos();
+  const { filteredTodos, totalPages } = useTodos();
+  const nearbyPages = 2; // Number of nearby pages to show
 
   const toggleTheme = () => {
     setDarkTheme((prevTheme) => !prevTheme);
@@ -48,20 +44,16 @@ function App() {
 
   const changePage = (page) => {
     setCurrentPage(page);
-    fetchTodos(page);
   };
 
-  // Function to generate pagination buttons for nearby pages
   const generatePagination = () => {
-    const nearbyPages = [];
-    const totalButtonsToShow = 5; // Number of buttons to show
+    const paginationButtons = [];
 
-    for (
-      let i = Math.max(1, currentPage - 2);
-      i <= Math.min(totalPages, currentPage + 2);
-      i++
-    ) {
-      nearbyPages.push(
+    let startPage = Math.max(1, currentPage - nearbyPages);
+    let endPage = Math.min(totalPages, currentPage + nearbyPages);
+
+    for (let i = startPage; i <= endPage; i++) {
+      paginationButtons.push(
         <button
           key={i}
           onClick={() => changePage(i)}
@@ -72,7 +64,7 @@ function App() {
       );
     }
 
-    return nearbyPages;
+    return paginationButtons;
   };
 
   return (
@@ -86,7 +78,7 @@ function App() {
       </div>
       <div>
         <ul className="todo-list">
-          {documents.map((todo) => (
+          {filteredTodos.map((todo) => (
             <li key={todo.id}>
               <strong>{todo.title}</strong>
               <p className={todo.completed ? "completed" : "incomplete"}>
