@@ -1,11 +1,8 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 
-function App() {
+function useTodos() {
   const [documents, setDocuments] = useState([]);
-  // const [comment, setComment] = useState("");
-  const [darkTheme, setDarkTheme] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   const fetchTodos = async (page) => {
@@ -21,8 +18,8 @@ function App() {
   };
 
   useEffect(() => {
-    fetchTodos(currentPage);
-  }, [currentPage]);
+    fetchTodos(1); // Initial fetch
+  }, []);
 
   useEffect(() => {
     fetch("https://jsonplaceholder.typicode.com/todos")
@@ -36,11 +33,14 @@ function App() {
       });
   }, []);
 
-  // const handleSubmit = (evt) => {
-  //   evt.preventDefault();
-  //   setDocuments((prevItems) => [...prevItems, { title: comment }]);
-  //   setComment("");
-  // };
+  return { documents, totalPages, fetchTodos };
+}
+
+function App() {
+  const [darkTheme, setDarkTheme] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const { documents, totalPages, fetchTodos } = useTodos();
 
   const toggleTheme = () => {
     setDarkTheme((prevTheme) => !prevTheme);
@@ -48,6 +48,7 @@ function App() {
 
   const changePage = (page) => {
     setCurrentPage(page);
+    fetchTodos(page);
   };
 
   return (
