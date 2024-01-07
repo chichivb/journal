@@ -1,38 +1,86 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
-import Comment from "./components/Comment";
 
 function App() {
   const [documents, setDocuments] = useState([]);
-  const [comment, setComment] = useState("");
+  // const [comment, setComment] = useState("");
+  const [darkTheme, setDarkTheme] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const handleSubmit = (evt) => {
-    evt.preventDefault();
-    console.log(comment);
+  const fetchTodos = async (page) => {
+    try {
+      const response = await fetch(
+        `https://jsonplaceholder.typicode.com/todos?_page=${page}`
+      );
+      const data = await response.json();
+      setDocuments(data);
+    } catch (error) {
+      console.error("Error fetching todos:", error);
+    }
+  };
 
-    setDocuments((prevItems) => [...prevItems, comment]);
-    setComment("");
+  useEffect(() => {
+    fetchTodos(currentPage);
+  }, [currentPage]);
+
+  useEffect(() => {
+    fetch("https://jsonplaceholder.typicode.com/todos")
+      .then((response) => response.json())
+      .then((data) => {
+        const totalPages = Math.ceil(data.length / 10); // Assuming 10 todos per page
+        setTotalPages(totalPages);
+      })
+      .catch((error) => {
+        console.error("Error fetching todos:", error);
+      });
+  }, []);
+
+  // const handleSubmit = (evt) => {
+  //   evt.preventDefault();
+  //   setDocuments((prevItems) => [...prevItems, { title: comment }]);
+  //   setComment("");
+  // };
+
+  const toggleTheme = () => {
+    setDarkTheme((prevTheme) => !prevTheme);
+  };
+
+  const changePage = (page) => {
+    setCurrentPage(page);
   };
 
   return (
-    <>
-      <div className="container">
-        <h1>Journal</h1>
-        <h2>What do you wish to document:</h2>
-        <textarea
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-        ></textarea>
-        <button onClick={handleSubmit}>Submit</button>
+    <div className={`container ${darkTheme ? "dark" : ""}`}>
+      <h1>Journal</h1>
+      <div className="theme-toggle">
+        <label>
+          <input type="checkbox" checked={darkTheme} onChange={toggleTheme} />
+          Dark Theme
+        </label>
       </div>
       <div>
         <ul>
-          {documents.map((document, index) => (
-            <Comment key={index} text={document}></Comment>
+          {documents.map((todo) => (
+            <li key={todo.id}>{todo.title}</li>
           ))}
         </ul>
+
+        <div className="pagination">
+          {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+            (page) => (
+              <button
+                key={page}
+                onClick={() => changePage(page)}
+                className={currentPage === page ? "active" : ""}
+              >
+                {page}
+              </button>
+            )
+          )}
+        </div>
       </div>
-    </>
+    </div>
   );
 }
 
