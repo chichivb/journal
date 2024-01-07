@@ -51,6 +51,30 @@ function App() {
     fetchTodos(page);
   };
 
+  // Function to generate pagination buttons for nearby pages
+  const generatePagination = () => {
+    const nearbyPages = [];
+    const totalButtonsToShow = 5; // Number of buttons to show
+
+    for (
+      let i = Math.max(1, currentPage - 2);
+      i <= Math.min(totalPages, currentPage + 2);
+      i++
+    ) {
+      nearbyPages.push(
+        <button
+          key={i}
+          onClick={() => changePage(i)}
+          className={currentPage === i ? "active" : ""}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    return nearbyPages;
+  };
+
   return (
     <div className={`container ${darkTheme ? "dark" : ""}`}>
       <h1>Journal</h1>
@@ -61,25 +85,16 @@ function App() {
         </label>
       </div>
       <div>
-        <ul>
+        <ul className="todo-list">
           {documents.map((todo) => (
-            <li key={todo.id}>{todo.title}</li>
+            <li key={todo.id}>
+              <strong>{todo.title}</strong>
+              <p>{todo.completed ? "Completed" : "Incomplete"}</p>
+            </li>
           ))}
         </ul>
 
-        <div className="pagination">
-          {Array.from({ length: totalPages }, (_, index) => index + 1).map(
-            (page) => (
-              <button
-                key={page}
-                onClick={() => changePage(page)}
-                className={currentPage === page ? "active" : ""}
-              >
-                {page}
-              </button>
-            )
-          )}
-        </div>
+        <div className="pagination">{generatePagination()}</div>
       </div>
     </div>
   );
