@@ -56,7 +56,18 @@ ul.todo-list li {
   margin-bottom: 10px;
   padding: 10px;
 }
+/* Style for Completed and Incomplete text */
+ul.todo-list li p {
+  margin: 5px 0;
+}
 
+ul.todo-list li p.completed {
+  color: green;
+}
+
+ul.todo-list li p.incomplete {
+  color: red;
+}
 .pagination {
   margin-top: 20px;
 }

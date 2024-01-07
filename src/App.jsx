@@ -89,7 +89,9 @@ function App() {
           {documents.map((todo) => (
             <li key={todo.id}>
               <strong>{todo.title}</strong>
-              <p>{todo.completed ? "Completed" : "Incomplete"}</p>
+              <p className={todo.completed ? "completed" : "incomplete"}>
+                {todo.completed ? "Completed" : "Incomplete"}
+              </p>
             </li>
           ))}
         </ul>
