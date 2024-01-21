@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { AiOutlineCheck } from "react-icons/ai"; // Importing an example icon
 import { IoIosMoon, IoIosSunny } from "react-icons/io";
+import { IoIosClose } from "react-icons/io";
 import { MdAdd } from "react-icons/md";
 import "./App.css";
 
@@ -148,9 +149,15 @@ function App() {
           {filteredTodos.map((todo) => (
             <li key={todo.id}>
               <strong>{todo.title}</strong>
-              <p className={todo.completed ? "completed" : "incomplete"}>
-                {todo.completed ? <AiOutlineCheck /> : "Incomplete"}
-              </p>
+              {todo.completed ? (
+                <p className="completed">
+                  <AiOutlineCheck /> Completed
+                </p>
+              ) : (
+                <p className="incomplete">
+                  <IoIosClose /> Incomplete
+                </p>
+              )}
             </li>
           ))}
         </ul>
